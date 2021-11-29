@@ -1,0 +1,108 @@
+<grip:Pipeline>
+  <sources>
+    <grip:MultiImageFile>
+      <property name="numImages" value="3"/>
+      <property name="path[0]" value="/Users/kazengallman/ohmnist/test5.jpeg"/>
+      <property name="path[1]" value="/Users/kazengallman/ohmnist/test.png"/>
+      <property name="index" value="0"/>
+      <property name="path[2]" value="/Users/kazengallman/ohmnist/test2.jpg"/>
+    </grip:MultiImageFile>
+    <grip:ImageFile>
+      <property name="path" value="/Users/kazengallman/Desktop/Screen Shot 2021-11-28 at 3.50.32 PM.png"/>
+    </grip:ImageFile>
+  </sources>
+  <steps>
+    <grip:Step name="HSV Threshold">
+      <grip:Input step="0" socket="0"/>
+      <grip:Input step="0" socket="1">
+        <value>
+          <double>29.136690647482013</double>
+          <double>114.29541595925298</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="2">
+        <value>
+          <double>116.95143884892087</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="0" socket="3">
+        <value>
+          <double>94.01978417266184</double>
+          <double>255.0</double>
+        </value>
+      </grip:Input>
+      <grip:Output step="0" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="CV bitwise_not">
+      <grip:Input step="1" socket="0"/>
+      <grip:Output step="1" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="Mask">
+      <grip:Input step="2" socket="0"/>
+      <grip:Input step="2" socket="1"/>
+      <grip:Output step="2" socket="0" previewed="false"/>
+    </grip:Step>
+    <grip:Step name="RGB Threshold">
+      <grip:Input step="3" socket="0"/>
+      <grip:Input step="3" socket="1">
+        <value>
+          <double>0.0</double>
+          <double>0.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="3" socket="2">
+        <value>
+          <double>0.0</double>
+          <double>0.0</double>
+        </value>
+      </grip:Input>
+      <grip:Input step="3" socket="3">
+        <value>
+          <double>0.0</double>
+          <double>0.0</double>
+        </value>
+      </grip:Input>
+      <grip:Output step="3" socket="0" previewed="true"/>
+    </grip:Step>
+  </steps>
+  <connections>
+    <grip:Connection>
+      <grip:Output step="0" socket="0" previewed="false"/>
+      <grip:Input step="1" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output step="1" socket="0" previewed="false"/>
+      <grip:Input step="2" socket="1"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="1" socket="0" previewed="true"/>
+      <grip:Input step="3" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="false"/>
+      <grip:Input step="0" socket="0"/>
+    </grip:Connection>
+    <grip:Connection>
+      <grip:Output source="0" socket="0" previewed="false"/>
+      <grip:Input step="2" socket="0"/>
+    </grip:Connection>
+  </connections>
+  <settings>
+    <teamNumber>0</teamNumber>
+    <publishAddress>roboRIO-0-FRC.local</publishAddress>
+    <deployAddress>roboRIO-0-FRC.local</deployAddress>
+    <deployDir>/home/lvuser</deployDir>
+    <deployUser>lvuser</deployUser>
+    <deployJavaHome>/usr/local/frc/JRE/</deployJavaHome>
+    <deployJvmOptions>-Xmx50m -XX:-OmitStackTraceInFastThrow -XX:+HeapDumpOnOutOfMemoryError -XX:MaxNewSize=16m</deployJvmOptions>
+  </settings>
+  <codeGenerationSettings>
+    <language>Python</language>
+    <className>GripPipeline</className>
+    <implementWpilibPipeline>false</implementWpilibPipeline>
+    <saveDir>/Users/kazengallman/ohmnist</saveDir>
+    <packageName></packageName>
+    <moduleName>grip</moduleName>
+  </codeGenerationSettings>
+</grip:Pipeline>
