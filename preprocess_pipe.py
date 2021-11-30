@@ -73,9 +73,9 @@ def pipeline(img_path):
     #cv2.imshow("resized", fin_img)
     #cv2.waitKey(0)
 
-    fin_img = cv2.bilateralFilter(fin_img,9,75,75)
-    fin_img = cv2.medianBlur(fin_img,5)
-    fin_img = cv2.GaussianBlur(fin_img,(5,5),0)
+    #fin_img = cv2.bilateralFilter(fin_img,9,75,75)
+    #fin_img = cv2.medianBlur(fin_img,5)
+    #fin_img = cv2.GaussianBlur(fin_img,(5,5),0)
 
     #jhsd = create_mask(fin_img)
     #cv2.imshow("iodhalkd", jhsd)
@@ -100,7 +100,19 @@ def pipeline(img_path):
         nonMasked = np.where(glare_mask == 0)
         nonMaskedP = img[nonMasked[0], nonMasked[1], :]
 
-        img[indices[0], indices[1], :] = getDomColor(nonMaskedP)
+        # get black pixels
+        blackPixels = np.where(img == 0)
+
+        domColor = getDomColor(nonMaskedP)
+
+        img[indices[0], indices[1], :] = domColor
+        if not (domColor == (0, 0, 0)).all():
+            img[blackPixels[0], blackPixels[1], :] = domColor
+        
+        img = cv2.bilateralFilter(img,9,75,75)
+        img = cv2.medianBlur(img,5)
+        img = cv2.GaussianBlur(img,(5,5),0)
+
         #img = cv2.inpaint(img, create_mask(img), 21, cv2.INPAINT_TELEA)
         #cv2.imshow(str(i), img)
         adjusted_images.append(img)
