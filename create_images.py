@@ -6,7 +6,8 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 #dir = "../Downloads"
-dir = "./test_database"
+#dir = "./data/workingPhotos"
+dir = "./data/DATASET/data"
 directory_files = os.listdir(dir)
 total_images = len(directory_files)
 tensor_dim = (total_images*5, 200, 60, 3)
@@ -24,20 +25,38 @@ colorsToNum = {
     "yellow":4,
     "green":5,
     "blue":6,
+    "purple":7,
     "violet":7,
     "grey":8,
+    "gray":8,
     "white":9,
     "gold":10,
     "silver":11
 }
 
-for i, files in enumerate(directory_files):
+newList = []
+for i in directory_files:
+    if i[-4:].lower() == ".png" or i[-4:].lower() == ".jpg" or i[-5:].lower() == ".jpeg":
+        newList.append(i)
+
+# https://thispointer.com/python-get-list-of-files-in-directory-sorted-by-date-and-time/
+newList = sorted(newList,
+                        key = lambda x: os.path.getctime(os.path.join(dir, x)))
+
+for i, files in enumerate(newList):
+    print(files)
+    
     #print(str(i), files)
     #print(str(i), os.path.join(dir, files))
 
     # gets image path and creates processed images
     img_path = os.path.join(dir, files)
-    generated_images = pipeline(img_path)
+    try:
+        generated_images, entire_resistor = pipeline(img_path)
+    except:
+        print(f"Error with image: {files}")
+        print("Skipped for now")
+        continue
 
     # create outout folder if it doesnt exist
     if not os.path.isdir("image_outputs"):
@@ -49,10 +68,17 @@ for i, files in enumerate(directory_files):
     files = files.replace(".jpg", "")
     files = files.replace(".jpeg", "")
 
+    # create resistor folder if it doesnt exist
+    if not os.path.isdir(os.path.join("image_outputs", files)):
+        os.mkdir(os.path.join("image_outputs", files))
+
     # saves file as label name
-    labelToFile = zip(files.split(" "), generated_images)
+    labelToFile = zip(files.split(" ")[1:], generated_images)
     for j, pair in enumerate(labelToFile):
-        save_path = os.path.join("image_outputs", f"{i} {j} {pair[0]}.png")
+
+        dirPath = str(os.path.join("image_outputs", files))
+        save_path = os.path.join(dirPath, f"{i} {j} {pair[0]}.png")
+        # print(str(save_path))
 
         data[i*5 + j] = pair[1]
         labels[i*5 + j] = colorsToNum[pair[0]]
@@ -69,7 +95,7 @@ for i, files in enumerate(directory_files):
     test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test))
 
     #print(dataset)
-    tf.data.experimental.save(train_dataset, "./image_outputs/test.db")
+    tf.data.experimental.save(train_dataset, "./image_outputs/train.db")
     tf.data.experimental.save(test_dataset, "./image_outputs/test.db")
 
     new_dataset = tf.data.experimental.load("./image_outputs/test.db")

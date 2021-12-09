@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 from util import *
-import sys
 
 #Image of resistor
 
@@ -55,8 +54,7 @@ def pipeline(img_path):
     #cv2.imshow("masked reverse data", mask_reverse)
     #cv2.waitKey(0)
 
-    #masked_out = cv2.bitwise_and(frame, frame, mask=mask_reverse)
-    masked_out = frame
+    masked_out = cv2.bitwise_and(frame, frame, mask=mask_reverse)
 
     #cv2.imshow("masked data", masked_out)
     #cv2.waitKey(0)
@@ -69,11 +67,11 @@ def pipeline(img_path):
     #cv2.imshow("cropped data3", mask_reverse[y1:y2, x1:x2])
     #cv2.waitKey(0)
 
-    # squish_out = cutOffWhite(cropped_out, mask_reverse[y1:y2, x1:x2])
+    squish_out = cutOffWhite(cropped_out, mask_reverse[y1:y2, x1:x2])
     #cv2.imshow("squish data", squish_out)
     #cv2.waitKey(0)
 
-    fin_img = cv2.resize(cropped_out, (600, 300), interpolation = cv2.INTER_AREA)
+    fin_img = cv2.resize(squish_out, (600, 300), interpolation = cv2.INTER_AREA)
     #cv2.imshow("resized", fin_img)
     #cv2.waitKey(0)
 
@@ -90,8 +88,6 @@ def pipeline(img_path):
     #cv2.waitKey(0)
 
     split_images = splitImgToX(fin_img, 5)
-    #split_images = [img for i, img in enumerate(split_images) if i % 2 == 0]
-    #print(len(split_images))
 
     adjusted_images = []
     for i, img in enumerate(split_images):
@@ -128,12 +124,10 @@ def pipeline(img_path):
         adjusted_images.append(img)
     #cv2.waitKey(0)
 
-    return np.array(adjusted_images), fin_img
+    return np.array(adjusted_images)
 
 #pipeline('test5.jpeg')
 #pipeline('./data/2 GREEN PURPLE BLACK GOLD BROWN.JPG')
-
-#pipeline(sys.argv[1])
 
 """
 c, hierarchy = cv2.findContours(squish_out, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)

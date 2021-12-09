@@ -10,8 +10,8 @@ def pipeline(img_path):
     frame = cv2.imread(img_path, 1)
 
     hue = [29.136690647482013, 114.29541595925298]
-    sat = [107.77877697841727, 255.0]
-    val = [64.20863309352518, 255.0]
+    sat = [80.77877697841727, 255.0]
+    val = [40.20863309352518, 255.0]
 
     out = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     filtered = cv2.inRange(out, (hue[0], sat[0], val[0]),  (hue[1], sat[1], val[1]))
@@ -55,8 +55,8 @@ def pipeline(img_path):
     #cv2.imshow("masked reverse data", mask_reverse)
     #cv2.waitKey(0)
 
-    #masked_out = cv2.bitwise_and(frame, frame, mask=mask_reverse)
-    masked_out = frame
+    masked_out = cv2.bitwise_and(frame, frame, mask=mask_reverse)
+    #masked_out = frame
 
     #cv2.imshow("masked data", masked_out)
     #cv2.waitKey(0)
@@ -64,10 +64,10 @@ def pipeline(img_path):
     cropped_out = masked_out[y1:y2, x1:x2, :]
     #print(cropped_out.shape)
 
-    #cv2.imshow("cropped data", cropped_out)
-    #cv2.imshow("cropped data2", filtered[y1:y2, x1:x2])
-    #cv2.imshow("cropped data3", mask_reverse[y1:y2, x1:x2])
-    #cv2.waitKey(0)
+    cv2.imshow("cropped data", cropped_out)
+    cv2.imshow("cropped data2", filtered[y1:y2, x1:x2])
+    cv2.imshow("cropped data3", mask_reverse[y1:y2, x1:x2])
+    cv2.waitKey(0)
 
     # squish_out = cutOffWhite(cropped_out, mask_reverse[y1:y2, x1:x2])
     #cv2.imshow("squish data", squish_out)
@@ -124,16 +124,16 @@ def pipeline(img_path):
         img = cv2.GaussianBlur(img,(5,5),0)
 
         #img = cv2.inpaint(img, create_mask(img), 21, cv2.INPAINT_TELEA)
-        #cv2.imshow(str(i), img)
+        cv2.imshow(str(i), img)
         adjusted_images.append(img)
-    #cv2.waitKey(0)
+    cv2.waitKey(0)
 
-    return np.array(adjusted_images), fin_img
+    return np.array(adjusted_images)
 
 #pipeline('test5.jpeg')
 #pipeline('./data/2 GREEN PURPLE BLACK GOLD BROWN.JPG')
 
-#pipeline(sys.argv[1])
+pipeline(sys.argv[1])
 
 """
 c, hierarchy = cv2.findContours(squish_out, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)

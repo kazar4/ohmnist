@@ -69,6 +69,8 @@ def cutOffWhite(img, mask):
         if np.sum(col) > h/2:
             newImg.append(imgT[i])
     
+    #print(np.array(newImg).shape)
+
     return np.transpose(np.array(newImg), (1,0,2))
 
 
@@ -120,9 +122,13 @@ def getDomColor(img):
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 200, .1)
     flags = cv2.KMEANS_RANDOM_CENTERS
 
-    _, labels, palette = cv2.kmeans(pixels, n_colors, None, criteria, 10, flags)
+    try:
+        _, labels, palette = cv2.kmeans(pixels, n_colors, None, criteria, 10, flags)
+    except:
+        return None, False
+
     _, counts = np.unique(labels, return_counts=True)
 
     dominant = palette[np.argmax(counts)]
 
-    return dominant
+    return dominant, True
