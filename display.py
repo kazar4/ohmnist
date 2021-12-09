@@ -6,8 +6,9 @@ import seaborn_image as isns
 
 # losses for each model on a graph
 
+"""
 # use something like this to get the actual data
-#new_dataset = tf.data.experimental.load("./image_outputs/test.db")
+# new_dataset = tf.data.experimental.load("./image_outputs/test.db")
 lossesM1 = [1,2,3,4,5,6,1]
 lossesM2 = [2,3,1,2,4,6,1]
 lossesM3 = [2,5,5,2,4,6,5]
@@ -31,9 +32,11 @@ g = sns.lineplot(x="Batch", y="Loss",
 #g.legend.set_title("Model Losses Per Batch")
 
 plt.show()
-
-# color vs accuracy graph
 """
+
+"""
+# color vs accuracy graph
+
 numToColor = {
     0:"Black",
     1:"Brown",
@@ -68,6 +71,7 @@ g = sns.catplot(
     #palette="dark", alpha=.6
 ).set(title='Model Accuracy Per Color')
 
+g.fig.subplots_adjust(top=.95)
 g.despine(left=True)
 #g.set_axis_labels("", "Body mass (g)")
 g.legend.set_title("Model Accuracy Per Color")
@@ -75,14 +79,15 @@ g.legend.set_title("Model Accuracy Per Color")
 plt.show()
 """
 
-"""
+
+
 ############ Accuracies for each model ############
 forward_model_acc = 0.3
 cnn_model_acc = 0.1
 cnn_model_r_acc = 0.5
 
 names = ['feed forward model', 'cnn by bands', 'cnn by resistor']
-x = [5, 6, 15]
+x = [0.265625, 6, 15]
 d = {'Models': names, 'Accuracy': x}
 df = pd.DataFrame(data=d)
 
@@ -93,7 +98,6 @@ sns.set(style='dark')
 sns.set_context("poster")
 isns.set_context(mode="poster", fontfamily="sans-serif")
 
-ax.legend.set_title("Accuracy Per Model")
+#ax.legend.set_title("Accuracy Per Model")
 
 plt.show()
-"""
