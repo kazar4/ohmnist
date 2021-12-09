@@ -3,7 +3,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tensorflow.python.ops.gen_array_ops import empty
 from preprocess import get_data
-
+from color_acc import colorsAcc
 
 class Model(tf.keras.Model):
     def __init__(self, num_classes):
@@ -32,7 +32,8 @@ class Model(tf.keras.Model):
         self.pool1 = tf.keras.layers.MaxPool2D(pool_size=(3, 3), strides=(1,1), padding="valid")
         self.pool2 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(1,1), padding="valid")
 
-        self.dense1 = tf.keras.layers.Dense(5 * num_classes)
+        self.flatten = tf.keras.layers.Flatten()
+        self.dense1 = tf.keras.layers.Dense(num_classes)
 
 
     def call(self, inputs):
@@ -44,7 +45,8 @@ class Model(tf.keras.Model):
         p1out = self.pool1(c1out)
         c2out = self.conv2(p1out)
         p2out = self.pool2(c2out)
-        logits = self.dense1(p2out)
+        logits = self.dense1(self.flatten(p2out))
+        print(logits.shape)
 
         probs = tf.nn.softmax(logits)
 
@@ -70,7 +72,7 @@ class Model(tf.keras.Model):
         :return: Float (0,1) that contains batch accuracy
         """
         # calculate the batch accuracy
-        return np.mean(labels == np.argmax(probabilities, axis = 1))
+        return np.mean(labels == np.argmax(probabilities, axis = 1)), colorsAcc(probabilities, labels)
 
 
 def train(model, train_inputs, train_labels):
@@ -93,7 +95,7 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(logits, train_labels[i:i+model.batch_size])
-            model.loss_list.append(loss)
+            print(i, loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -104,7 +106,6 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:end])
             loss = model.loss(logits, train_labels[i:end])
-            model.loss_list.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
