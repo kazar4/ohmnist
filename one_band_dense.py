@@ -76,14 +76,15 @@ def train(model, train_inputs, train_labels):
     :param train_labels: train labels (all labels for training) of shape (num_labels,)
     :return: None
     """
-
+    losslist = []
     i = 0
     end = int(train_inputs.shape[0])
     while (i + model.batch_size) < end:
         with tf.GradientTape() as g:
             probs = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(probs, train_labels[i:i+model.batch_size])
-            print(i, loss)
+            losslist.append(loss)
+
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -94,11 +95,14 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             probs = model.call(train_inputs[i:end])
             loss = model.loss(probs, train_labels[i:end])
-            print(i, loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     
+    losses_m1 = tf.data.Dataset.from_tensor_slices(losslist)
+    tf.data.experimental.save(losses_m1, "./loss_densemodel.db")
+
     return
 
 
