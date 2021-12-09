@@ -1,4 +1,3 @@
-
 import tensorflow as tf
 
 def get_data(train_dir, test_dir):
