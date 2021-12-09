@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tensorflow.python.ops.gen_array_ops import empty
 from preprocess import get_data
+from color_acc import colorsAcc
 
 
 class Model(tf.keras.Model):
@@ -64,7 +65,10 @@ class Model(tf.keras.Model):
         :return: Float (0,1) that contains batch accuracy
         """
         # calculate the batch accuracy
-        return np.mean(labels == np.argmax(probabilities, axis = 1))
+        print("l", labels.shape)
+        print("p", probabilities.shape)
+
+        return np.mean(labels == np.argmax(probabilities, axis = 1)), colorsAcc(probabilities, labels)
 
 
 def train(model, train_inputs, train_labels):
@@ -118,11 +122,14 @@ def test(model, test_inputs, test_labels):
 
 def main():
     # Pre-process and vectorize the data
-    # data = get_data("./process_data/train.db", "./process_data/test.db")
-    data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
+    data = get_data("./processed_data/train.db", "./processed_data/test.db")
+    # data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
     train_data = data[0]
     test_data = data[1]
     # initialize model
+
+    print("got here")
+
     model = Model(12) #12 classes of colors to identify
 
     #train data needs to be set here TODO

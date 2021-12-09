@@ -18,6 +18,7 @@ colorsToNum = {
 }
 
 def colorsAcc(probs, labels):
+    print(labels.shape)
 
     acc = np.zeros(12)
     counts = np.zeros(12)
@@ -30,9 +31,14 @@ def colorsAcc(probs, labels):
 
         for j, val in enumerate(labels):
             if val == i:
-                colorP.append(probs[j])
                 colorL.append(labels[j])
+                colorP.append(probs[j])
                 colorC = colorC + 1
+
+        colorL = np.array(colorL)
+        colorP = np.array(colorP)
+        print(colorL.shape)
+        print(colorP.shape)
 
         acc[i] = np.mean(np.array(colorL) == np.argmax(np.array(colorP), axis = 1))
         counts[i] = colorC
