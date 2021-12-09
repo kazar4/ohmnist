@@ -46,7 +46,7 @@ class Model(tf.keras.Model):
         c2out = self.conv2(p1out)
         p2out = self.pool2(c2out)
         logits = self.dense1(self.flatten(p2out))
-        print(logits.shape)
+        print(logits)
 
         probs = tf.nn.softmax(logits)
 

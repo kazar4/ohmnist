@@ -78,6 +78,13 @@ class Model(tf.keras.Model):
         return np.mean(labels == probabilities)
 
 
+def image_flipper(train_data, train_labels):
+    """
+    flips every image and label, adding more pictures to our dataset to help combat overfitting
+    """
+    
+
+
 def train(model, train_inputs, train_labels):
     """
     Runs through one epoch - all training examples.
@@ -87,6 +94,7 @@ def train(model, train_inputs, train_labels):
     :param train_labels: train labels (all labels for training) of shape (num_labels,)
     :return: None
     """
+
 
     i = 0
     end = int(train_inputs.shape[0])
@@ -111,7 +119,6 @@ def train(model, train_inputs, train_labels):
     
     return
 
-
 def test(model, test_inputs, test_labels):
     """
     Runs through one epoch - all testing examples
@@ -124,7 +131,6 @@ def test(model, test_inputs, test_labels):
 
     probs = model.call(test_inputs)
     return model.accuracy(probs, test_labels)
-
 
 def main():
     # Pre-process and vectorize the data
