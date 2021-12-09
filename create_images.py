@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 #dir = "../Downloads"
 #dir = "./data/workingPhotos"
 #dir = "./data/DATASET/data"
-dir = "./data/data/"
+dir = "./data/FIN/DATASET/data"
 directory_files = os.listdir(dir)
 total_images = len(directory_files)
 tensor_dim = (total_images*5, 200, 60, 3)
@@ -96,27 +96,30 @@ for i, files in enumerate(newList):
     dataR[i] = entire_resistor
     labelsR[i] = np.array([colorsToNum[cTxt] for cTxt in files.split(" ")[1:]])
 
-    X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.15, random_state=42)
-
-    X_trainR, X_testR, y_trainR, y_testR = train_test_split(dataR, labelsR, test_size=0.15, random_state=42)
-
-    train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
-    test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test))
-
-    train_datasetR = tf.data.Dataset.from_tensor_slices((X_trainR, y_trainR))
-    test_datasetR = tf.data.Dataset.from_tensor_slices((X_testR, y_testR))
-
-    #print(dataset)
-    tf.data.experimental.save(train_dataset, "./image_outputs/train.db")
-    tf.data.experimental.save(test_dataset, "./image_outputs/test.db")
-
-    tf.data.experimental.save(train_datasetR, "./image_outputs/trainR.db")
-    tf.data.experimental.save(test_datasetR, "./image_outputs/testR.db")
-
-    new_dataset = tf.data.experimental.load("./image_outputs/test.db")
-
     #for d in new_dataset:
     #    print(d) 
     #    print("_______________________________________________")
     
     print(f"image {i} finished")
+
+
+X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.15, random_state=42)
+
+X_trainR, X_testR, y_trainR, y_testR = train_test_split(dataR, labelsR, test_size=0.15, random_state=42)
+
+train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test))
+
+train_datasetR = tf.data.Dataset.from_tensor_slices((X_trainR, y_trainR))
+test_datasetR = tf.data.Dataset.from_tensor_slices((X_testR, y_testR))
+
+#print(dataset)
+tf.data.experimental.save(train_dataset, "./image_outputs/train.db")
+tf.data.experimental.save(test_dataset, "./image_outputs/test.db")
+
+tf.data.experimental.save(train_datasetR, "./image_outputs/trainR.db")
+tf.data.experimental.save(test_datasetR, "./image_outputs/testR.db")
+
+new_dataset = tf.data.experimental.load("./image_outputs/test.db")
+
+print("end of images reached!")
