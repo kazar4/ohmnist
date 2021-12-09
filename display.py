@@ -6,6 +6,31 @@ import seaborn_image as isns
 
 # losses for each model on a graph
 
+# use something like this to get the actual data
+#new_dataset = tf.data.experimental.load("./image_outputs/test.db")
+lossesM1 = [1,2,3,4,5,6,1]
+lossesM2 = [2,3,1,2,4,6,1]
+lossesM3 = [2,5,5,2,4,6,5]
+
+batchNums = [i for i in range(len(lossesM1))] + [i for i in range(len(lossesM2))] + [i for i in range(len(lossesM3))]
+losses = lossesM1 + lossesM2 + lossesM3
+models = ['feed forward model']*len(lossesM1) + ['cnn by bands']*len(lossesM2) + ['cnn by resistor']*len(lossesM3)
+
+d = {'Batch': batchNums, 'Loss': losses, "Model": models}
+df = pd.DataFrame(data=d)
+#print(df)
+
+sns.set_style("darkgrid", {'axes.grid' : False})
+
+# Plot the responses for different events and regions
+g = sns.lineplot(x="Batch", y="Loss",
+             hue="Model",
+             data=df).set(title='Model Losses Per Batch')
+
+#g.despine(left=True)
+#g.legend.set_title("Model Losses Per Batch")
+
+plt.show()
 
 # color vs accuracy graph
 """
@@ -41,11 +66,11 @@ g = sns.catplot(
     data=df, kind="bar",
     x="Models", y="Accuracy", hue="Colors", palette = colors, alpha=.6
     #palette="dark", alpha=.6
-)
+).set(title='Model Accuracy Per Color')
 
 g.despine(left=True)
 #g.set_axis_labels("", "Body mass (g)")
-g.legend.set_title("")
+g.legend.set_title("Model Accuracy Per Color")
 
 plt.show()
 """
@@ -67,6 +92,8 @@ ax = sns.barplot(x = "Models", y = "Accuracy", data = df, palette=("Blues_d")).s
 sns.set(style='dark')
 sns.set_context("poster")
 isns.set_context(mode="poster", fontfamily="sans-serif")
+
+ax.legend.set_title("Accuracy Per Model")
 
 plt.show()
 """
