@@ -46,8 +46,7 @@ class Model(tf.keras.Model):
         p2out = self.pool2(c2out)
         logits = self.dense1(p2out)
 
-        reshaped = tf.reshape(logits, [-1, 5, 12])
-        probs = tf.nn.softmax(reshaped)
+        probs = tf.nn.softmax(logits)
 
         return probs
         
@@ -61,6 +60,17 @@ class Model(tf.keras.Model):
         """
 
         return tf.reduce_mean(tf.keras.metrics.sparse_categorical_crossentropy(labels, probs))
+
+    def accuracy(self, probabilities, labels):
+        """
+        Calculates the model's accuracy by comparing the number 
+        of correct predictions with the correct answers.
+        :param probabilities: result of running model.call() on test inputs
+        :param labels: test set labels
+        :return: Float (0,1) that contains batch accuracy
+        """
+        # calculate the batch accuracy
+        return np.mean(labels == np.argmax(probabilities, axis = 1))
 
 
 def train(model, train_inputs, train_labels):
@@ -112,35 +122,28 @@ def test(model, test_inputs, test_labels):
     :returns: list of losses
     """
 
-    losses = []
-    i = 0
-    end = len(test_inputs)
-    while (i + model.batch_size) < end:
-        probs = model.call(test_inputs[i:i+model.batch_size])
-        losses.append(model.loss(probs, test_labels[i:i+model.batch_size]))
-        i += model.batch_size
-    
-    if not(i == end):
-        probs = model.call(test_inputs[i:end])
-        losses.append(model.loss(probs, test_labels[i:end]))
-
-    return losses
+    probs = model.call(test_inputs)
+    return model.accuracy(probs, test_labels)
 
 
 def main():
     # Pre-process and vectorize the data
-    data = get_data('../../data/train.txt', '../../data/test.txt')
+    # data = get_data("./process_data/train.db", "./process_data/test.db")
+    data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
     train_data = data[0]
     test_data = data[1]
     # initialize model
     model = Model(12) #12 classes of colors to identify
 
     #train data needs to be set here TODO
-
+    
+    train_inputs = np.array([pair[0] for pair in train_data])
+    train_labels = np.array([pair[1] for pair in train_data])
     train(model, train_inputs, train_labels)
 
     #need to do test data TODO
-
+    test_inputs = np.array([pair[0] for pair in test_data])
+    test_labels = np.array([pair[1] for pair in test_data])
     # Print out loss 
     print(test(model, test_inputs, test_labels))
 
