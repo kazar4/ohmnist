@@ -7,13 +7,17 @@ from sklearn.model_selection import train_test_split
 
 #dir = "../Downloads"
 #dir = "./data/workingPhotos"
-dir = "./data/DATASET/data"
+#dir = "./data/DATASET/data"
+dir = "./data/data/"
 directory_files = os.listdir(dir)
 total_images = len(directory_files)
 tensor_dim = (total_images*5, 200, 60, 3)
 #200, 60, 3)
 data = np.zeros(tensor_dim)
 labels = np.zeros(total_images*5)
+
+dataR = np.zeros((total_images, 300, 600, 3))
+labelsR = np.zeros((total_images, 5))
 
 #https://www.digikey.com/en/articles/big-boys-race-young-girls-violet-wins-resistors-color-codes
 # Color chart being used for dictionary, going in order from top to bottom
@@ -88,15 +92,26 @@ for i, files in enumerate(newList):
         #test = np.vstack([data, labels])
         #test = list(zip(data, labels))
         #print(test)
+    
+    dataR[i] = entire_resistor
+    labelsR[i] = np.array([colorsToNum[cTxt] for cTxt in files.split(" ")[1:]])
 
     X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.15, random_state=42)
+
+    X_trainR, X_testR, y_trainR, y_testR = train_test_split(dataR, labelsR, test_size=0.15, random_state=42)
 
     train_dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
     test_dataset = tf.data.Dataset.from_tensor_slices((X_test, y_test))
 
+    train_datasetR = tf.data.Dataset.from_tensor_slices((X_trainR, y_trainR))
+    test_datasetR = tf.data.Dataset.from_tensor_slices((X_testR, y_testR))
+
     #print(dataset)
     tf.data.experimental.save(train_dataset, "./image_outputs/train.db")
     tf.data.experimental.save(test_dataset, "./image_outputs/test.db")
+
+    tf.data.experimental.save(train_datasetR, "./image_outputs/trainR.db")
+    tf.data.experimental.save(test_datasetR, "./image_outputs/testR.db")
 
     new_dataset = tf.data.experimental.load("./image_outputs/test.db")
 
