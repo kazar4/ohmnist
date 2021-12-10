@@ -122,8 +122,9 @@ def test(model, test_inputs, test_labels):
 
 def main():
     # Pre-process and vectorize the data
-    data = get_data("./processed_data/train.db", "./processed_data/test.db")
-    # data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
+    #data = get_data("./processed_data/train.db", "./processed_data/test.db")
+    #data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
+    data = get_data("F:/train.db", "F:/test.db")
     train_data = data[0]
     test_data = data[1]
     # initialize model
@@ -143,6 +144,7 @@ def main():
     test_labels = np.array([pair[1] for pair in test_data])
     # Print out loss 
     print(test(model, test_inputs, test_labels))
+    #print(test(model, train_inputs, train_labels))
 
     pass
 

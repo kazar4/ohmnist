@@ -1,4 +1,4 @@
-import opencv as cv2
+import cv2
 #pip install opencv-python
 
 # give an image

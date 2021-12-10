@@ -17,6 +17,7 @@ colorsToNum = {
     "silver":11
 }
 
+"""
 def colorsAcc(probs, labels):
     print(labels.shape)
 
@@ -42,5 +43,30 @@ def colorsAcc(probs, labels):
 
         acc[i] = np.mean(np.array(colorL) == np.argmax(np.array(colorP), axis = 1))
         counts[i] = colorC
+    
+    return acc, counts
+"""
+
+def colorsAcc(probs, labels):
+
+    acc = np.zeros(12)
+    counts = np.zeros(12)
+    
+    probs = probs.numpy()
+    
+    for i in range(0,12):
+        indices = np.nonzero(labels == i)[0]
+        indices = list((indices.astype(int).T))
+
+        counts[i] = len(indices)
+
+        colorL = labels[indices]
+        colorP = probs[indices]
+
+        #print(indices)
+        #print("nL", colorL.shape)
+        #print("nP", colorP.shape)
+
+        acc[i] = np.mean(colorL == np.argmax(colorP, axis = 1))
     
     return acc, counts
