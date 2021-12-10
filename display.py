@@ -34,7 +34,7 @@ g = sns.lineplot(x="Batch", y="Loss",
 plt.show()
 """
 
-"""
+
 # color vs accuracy graph
 
 numToColor = {
@@ -55,39 +55,42 @@ numToColor = {
 #penguins = sns.load_dataset("penguins")
 #print(penguins)
 
-colors = [c for i, c in numToColor.items()]*3
-colorAcc = [1,1,2,3,4,5,6,7,8,9,10,11] + [1,1,2,3,4,5,6,7,8,9,10,11] + [1,1,2,3,4,5,6,7,8,9,10,11]
-models = ['feed forward model']*12 + ['cnn by bands']*12 + ['cnn by resistor']*12
+colors = [c for i, c in numToColor.items()]
+#*3
+colorAcc = [293, 378, 95, 57, 11, 53, 42, 33, 36, 23, 59, 3]
+#+ [1,1,2,3,4,5,6,7,8,9,10,11] + [1,1,2,3,4,5,6,7,8,9,10,11]
+#models = ['feed forward model']*12 
+#+ ['cnn by bands']*12 + ['cnn by resistor']*12
 
-d = {'Colors': colors, 'Accuracy': colorAcc, "Models": models}
+d = {'Colors': colors, 'Resistor Band Count': colorAcc}
+#"Models": models}
 df = pd.DataFrame(data=d)
 print(df)
 
 sns.set_style("darkgrid", {'axes.grid' : False})
 
-g = sns.catplot(
-    data=df, kind="bar",
-    x="Models", y="Accuracy", hue="Colors", palette = colors, alpha=.6
+g = sns.barplot(
+    data=df,
+    x="Colors", y="Resistor Band Count", palette = colors, alpha=.6
     #palette="dark", alpha=.6
-).set(title='Model Accuracy Per Color')
+).set(title='Number of Bands for Each Color in Dataset')
 
-g.fig.subplots_adjust(top=.95)
-g.despine(left=True)
+#g.fig.subplots_adjust(top=.95)
+#g.despine(left=True)
 #g.set_axis_labels("", "Body mass (g)")
-g.legend.set_title("Model Accuracy Per Color")
+#g.legend.set_title("Model Accuracy Per Color")
 
 plt.show()
+
 """
 
-
-
 ############ Accuracies for each model ############
-forward_model_acc = 0.3
-cnn_model_acc = 0.1
-cnn_model_r_acc = 0.5
+forward_model_acc = 0.265625
+cnn_model_acc = 0.291666
+cnn_model_r_acc = 0.579487
 
 names = ['feed forward model', 'cnn by bands', 'cnn by resistor']
-x = [0.265625, 6, 15]
+x = [forward_model_acc, cnn_model_acc, cnn_model_r_acc]
 d = {'Models': names, 'Accuracy': x}
 df = pd.DataFrame(data=d)
 
@@ -101,3 +104,4 @@ isns.set_context(mode="poster", fontfamily="sans-serif")
 #ax.legend.set_title("Accuracy Per Model")
 
 plt.show()
+"""
