@@ -23,7 +23,7 @@ class Model(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(num_classes * num_classes)
+        self.dense1 = tf.keras.layers.Dense(num_classes * num_classes, activation="relu")
         self.dense2 = tf.keras.layers.Dense(num_classes)
 
 
