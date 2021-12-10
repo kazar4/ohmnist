@@ -87,7 +87,7 @@ plt.show()
 ############ Accuracies for each model ############
 forward_model_acc = 0.265625
 cnn_model_acc = 0.291666
-cnn_model_r_acc = 0.5
+cnn_model_r_acc = 0.579487
 
 names = ['feed forward model', 'cnn by bands', 'cnn by resistor']
 x = [forward_model_acc, cnn_model_acc, cnn_model_r_acc]

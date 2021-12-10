@@ -3,6 +3,7 @@ import numpy as np
 from tensorflow.keras import Model
 from tensorflow.python.ops.gen_array_ops import empty
 from preprocess import get_data
+from color_acc import colorsAcc
 
 
 class Model(tf.keras.Model):
@@ -26,12 +27,13 @@ class Model(tf.keras.Model):
         self.image_height = 300
         self.input_channels = 3
 
-        self.conv1 = tf.keras.layers.Conv2D(32, (5, 5), padding="valid", activation="relu", data_format="channels_last", input_shape=(self.image_width, self.image_height, self.input_channels))
-        self.conv2 = tf.keras.layers.Conv2D(16, (5, 5), padding="valid", activation="relu", data_format="channels_last")
+        self.conv1 = tf.keras.layers.Conv2D(32, (5, 5), (2, 1), padding="valid", activation="relu", data_format="channels_last", input_shape=(self.image_width, self.image_height, self.input_channels))
+        self.conv2 = tf.keras.layers.Conv2D(16, (5, 5), (2, 1), padding="valid", activation="relu", data_format="channels_last")
         
         self.pool1 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(1,1), padding="valid")
         self.pool2 = tf.keras.layers.MaxPool2D(pool_size=(2, 2), strides=(1,1), padding="valid")
 
+        self.flatten = tf.keras.layers.Flatten()
         self.dense1 = tf.keras.layers.Dense(5 * num_classes)
 
 
@@ -44,7 +46,7 @@ class Model(tf.keras.Model):
         p1out = self.pool1(c1out)
         c2out = self.conv2(p1out)
         p2out = self.pool2(c2out)
-        logits = self.dense1(p2out)
+        logits = self.dense1(self.flatten(p2out))
 
         reshaped = tf.reshape(logits, [-1, 5, 12])
         probs = tf.nn.softmax(reshaped)
@@ -71,7 +73,24 @@ class Model(tf.keras.Model):
         :return: Float (0,1) that contains batch accuracy
         """
         # calculate the batch accuracy
-        return np.mean(labels == np.argmax(probabilities, axis = 1))
+        probabilities = np.argmax(probabilities, axis=2)
+        print(probabilities)
+        return np.mean(labels == probabilities)
+
+
+# def image_flipper(train_images, train_labels):
+#     """
+#     flips every image and label, adding more pictures to our dataset to help combat overfitting
+#     """
+#     length = len(train_labels)
+#     new_images = np.array(tf.reverse(train_images, [2]))
+#     print(train_images[0])
+#     print('mid')
+#     new_labels = np.array(tf.reverse(train_labels, [1]))
+#     print(new_images[0])
+
+#     return
+    
 
 
 def train(model, train_inputs, train_labels):
@@ -83,18 +102,15 @@ def train(model, train_inputs, train_labels):
     :param train_labels: train labels (all labels for training) of shape (num_labels,)
     :return: None
     """
-    shuffle = np.arange(len(train_labels))			#reorder for mixed batches
-    np.random.shuffle(shuffle)
-    tf.gather(train_inputs, shuffle)
-    tf.gather(train_labels, shuffle)
 
+    losslist = []
     i = 0
     end = int(train_inputs.shape[0])
     while (i + model.batch_size) < end:
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(logits, train_labels[i:i+model.batch_size])
-            model.loss_list.append(loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -105,13 +121,15 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:end])
             loss = model.loss(logits, train_labels[i:end])
-            model.loss_list.append(loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+    losses_m1 = tf.data.Dataset.from_tensor_slices(losslist)
+    tf.data.experimental.save(losses_m1, "./loss_fullresistor.db")
     
     return
-
 
 def test(model, test_inputs, test_labels):
     """
@@ -126,11 +144,9 @@ def test(model, test_inputs, test_labels):
     probs = model.call(test_inputs)
     return model.accuracy(probs, test_labels)
 
-
 def main():
     # Pre-process and vectorize the data
-    # data = get_data("./process_data/train.db", "./process_data/test.db")
-    data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
+    data = get_data("/Volumes/POGDRIVE/trainR.db", "/Volumes/POGDRIVE/testR.db")
     train_data = data[0]
     test_data = data[1]
     # initialize model
@@ -139,6 +155,7 @@ def main():
     #train data needs to be set here
     train_inputs = np.array([pair[0] for pair in train_data])
     train_labels = np.array([pair[1] for pair in train_data])
+    # image_flipper(train_inputs, train_labels)
     train(model, train_inputs, train_labels)
 
     #need to do test data

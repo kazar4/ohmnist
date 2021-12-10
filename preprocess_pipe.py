@@ -128,8 +128,8 @@ def pipeline(img_path):
         adjusted_images.append(img)
     #cv2.waitKey(0)
 
-    cv2.imshow("img", fin_img)
-    cv2.waitKey()
+    cv2.imshow("test", fin_img)
+    cv2.waitKey(0)
 
     return np.array(adjusted_images), fin_img
 
