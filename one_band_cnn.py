@@ -46,7 +46,6 @@ class Model(tf.keras.Model):
         c2out = self.conv2(p1out)
         p2out = self.pool2(c2out)
         logits = self.dense1(self.flatten(p2out))
-        print(logits)
 
         probs = tf.nn.softmax(logits)
 
@@ -72,7 +71,7 @@ class Model(tf.keras.Model):
         :return: Float (0,1) that contains batch accuracy
         """
         # calculate the batch accuracy
-        return np.mean(labels == np.argmax(probabilities, axis = 1)), colorsAcc(probabilities, labels)
+        return np.mean(labels == np.argmax(probabilities, axis = 1))
 
 
 def train(model, train_inputs, train_labels):
@@ -84,18 +83,14 @@ def train(model, train_inputs, train_labels):
     :param train_labels: train labels (all labels for training) of shape (num_labels,)
     :return: None
     """
-    shuffle = np.arange(len(train_labels))			#reorder for mixed batches
-    np.random.shuffle(shuffle)
-    tf.gather(train_inputs, shuffle)
-    tf.gather(train_labels, shuffle)
-
+    losslist = []
     i = 0
     end = int(train_inputs.shape[0])
     while (i + model.batch_size) < end:
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(logits, train_labels[i:i+model.batch_size])
-            print(i, loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -106,10 +101,14 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:end])
             loss = model.loss(logits, train_labels[i:end])
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     
+    losses_m1 = tf.data.Dataset.from_tensor_slices(losslist)
+    tf.data.experimental.save(losses_m1, "./loss_onebandcnn.db")
+
     return
 
 

@@ -78,10 +78,18 @@ class Model(tf.keras.Model):
         return np.mean(labels == probabilities)
 
 
-def image_flipper(train_data, train_labels):
-    """
-    flips every image and label, adding more pictures to our dataset to help combat overfitting
-    """
+# def image_flipper(train_images, train_labels):
+#     """
+#     flips every image and label, adding more pictures to our dataset to help combat overfitting
+#     """
+#     length = len(train_labels)
+#     new_images = np.array(tf.reverse(train_images, [2]))
+#     print(train_images[0])
+#     print('mid')
+#     new_labels = np.array(tf.reverse(train_labels, [1]))
+#     print(new_images[0])
+
+#     return
     
 
 
@@ -95,14 +103,14 @@ def train(model, train_inputs, train_labels):
     :return: None
     """
 
-
+    losslist = []
     i = 0
     end = int(train_inputs.shape[0])
     while (i + model.batch_size) < end:
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(logits, train_labels[i:i+model.batch_size])
-            print(i, loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -113,9 +121,13 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             logits = model.call(train_inputs[i:end])
             loss = model.loss(logits, train_labels[i:end])
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+
+    losses_m1 = tf.data.Dataset.from_tensor_slices(losslist)
+    tf.data.experimental.save(losses_m1, "./loss_fullresistor.db")
     
     return
 
@@ -143,6 +155,7 @@ def main():
     #train data needs to be set here
     train_inputs = np.array([pair[0] for pair in train_data])
     train_labels = np.array([pair[1] for pair in train_data])
+    # image_flipper(train_inputs, train_labels)
     train(model, train_inputs, train_labels)
 
     #need to do test data

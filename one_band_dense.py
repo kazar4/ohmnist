@@ -23,7 +23,7 @@ class Model(tf.keras.Model):
         self.optimizer = tf.keras.optimizers.Adam(self.learning_rate)
 
         self.flatten = tf.keras.layers.Flatten()
-        self.dense1 = tf.keras.layers.Dense(num_classes * num_classes)
+        self.dense1 = tf.keras.layers.Dense(num_classes * num_classes, activation="relu")
         self.dense2 = tf.keras.layers.Dense(num_classes)
 
 
@@ -76,14 +76,15 @@ def train(model, train_inputs, train_labels):
     :param train_labels: train labels (all labels for training) of shape (num_labels,)
     :return: None
     """
-
+    losslist = []
     i = 0
     end = int(train_inputs.shape[0])
     while (i + model.batch_size) < end:
         with tf.GradientTape() as g:
             probs = model.call(train_inputs[i:i+model.batch_size])
             loss = model.loss(probs, train_labels[i:i+model.batch_size])
-            print(i, loss)
+            losslist.append(loss)
+
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
@@ -94,11 +95,14 @@ def train(model, train_inputs, train_labels):
         with tf.GradientTape() as g:
             probs = model.call(train_inputs[i:end])
             loss = model.loss(probs, train_labels[i:end])
-            print(i, loss)
+            losslist.append(loss)
 
         gradients = g.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
     
+    losses_m1 = tf.data.Dataset.from_tensor_slices(losslist)
+    tf.data.experimental.save(losses_m1, "./loss_densemodel.db")
+
     return
 
 
@@ -118,6 +122,9 @@ def test(model, test_inputs, test_labels):
 
 def main():
     # Pre-process and vectorize the data
+    #data = get_data("./processed_data/train.db", "./processed_data/test.db")
+    #data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
+    #data = get_data("F:/train.db", "F:/test.db")
     # data = get_data("./process_data/train.db", "./process_data/test.db")
     data = get_data("/Volumes/POGDRIVE/train.db", "/Volumes/POGDRIVE/test.db")
     train_data = data[0]
@@ -136,6 +143,7 @@ def main():
     test_labels = np.array([pair[1] for pair in test_data])
     # Print out loss 
     print(test(model, test_inputs, test_labels))
+    #print(test(model, train_inputs, train_labels))
 
     pass
 
